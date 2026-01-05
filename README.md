@@ -189,36 +189,10 @@ This engine is designed as a starting point. Here are some directions you could 
 
 ---
 
-## Inspiration & References
+## Inspiration
 
-This project draws inspiration from classic isometric games:
-
-### City Builders
-- **SimCity 2000/3000/4** - The gold standard for city simulation
-- **Cities: Skylines** - Modern take with detailed traffic simulation
-- **Theotown** - Mobile-friendly SimCity clone
-
-### Tycoon Games
+- **SimCity 3000/4** - The gold standard for city simulation
 - **RollerCoaster Tycoon 1 & 2** - Chris Sawyer's masterpiece, hand-coded in assembly
-- **Transport Tycoon** - Complex logistics in isometric view
-- **OpenTTD** - Open source Transport Tycoon with incredible modding
-- **Theme Hospital** - Charming isometric management
-
-### Strategy Games
-- **Civilization series** - 4X with isometric roots (Civ 2, 3)
-- **Age of Empires 2** - Isometric RTS perfection
-- **Command & Conquer: Red Alert** - Classic isometric RTS
-- **Factorio** - Factory building with isometric-adjacent view
-
-### Colony Sims
-- **RimWorld** - Deep simulation with simple graphics
-- **Dwarf Fortress** - The ultimate simulation complexity
-- **Prison Architect** - Accessible management sim
-
-### Visual Style References
-- **Pocket City** - Clean, modern mobile city builder
-- **Northgard** - Beautiful isometric RTS
-- **Frostpunk** - Atmospheric city survival
 
 ---
 
