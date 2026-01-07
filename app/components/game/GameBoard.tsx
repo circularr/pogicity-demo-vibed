@@ -21,7 +21,7 @@ import {
   getAffectedSegments,
   canPlaceRoadSegment,
 } from "./roadUtils";
-import { getBuilding, getBuildingFootprint } from "@/app/data/buildings";
+import { getBuilding, getBuildingFootprint, BuildingCategory } from "@/app/data/buildings";
 import dynamic from "next/dynamic";
 import type { PhaserGameHandle } from "./phaser/PhaserGame";
 import {
@@ -56,6 +56,7 @@ import MusicPlayer from "../ui/MusicPlayer";
 import LoadWindow from "../ui/LoadWindow";
 import Modal from "../ui/Modal";
 import PromptModal from "../ui/PromptModal";
+import { AssetGeneratorModal } from "../ui/AssetGeneratorModal";
 
 // Initialize empty grid
 const createEmptyGrid = (): GridCell[][] => {
@@ -141,6 +142,10 @@ export default function GameBoard() {
   // Mobile warning state
   const [isMobile, setIsMobile] = useState(false);
   const [mobileWarningDismissed, setMobileWarningDismissed] = useState(false);
+
+  // Asset Generator state
+  const [isAssetGeneratorOpen, setIsAssetGeneratorOpen] = useState(false);
+  const [assetGeneratorCategory, setAssetGeneratorCategory] = useState<BuildingCategory>('commercial');
 
   // Detect mobile device
   useEffect(() => {
@@ -1399,9 +1404,8 @@ export default function GameBoard() {
               playDoubleClickSound();
             }
           }}
-          className={`rct-maroon-button-interactive ${
-            isToolWindowVisible ? "active" : ""
-          }`}
+          className={`rct-maroon-button-interactive ${isToolWindowVisible ? "active" : ""
+            }`}
           title="Build Menu"
           style={{
             background: isToolWindowVisible ? "#4a1a1a" : "#6b2a2a",
@@ -1470,9 +1474,8 @@ export default function GameBoard() {
             }
             playDoubleClickSound();
           }}
-          className={`rct-maroon-button-interactive ${
-            selectedTool === ToolType.Eraser ? "active" : ""
-          }`}
+          className={`rct-maroon-button-interactive ${selectedTool === ToolType.Eraser ? "active" : ""
+            }`}
           title="Eraser (Esc to deselect)"
           style={{
             background:
@@ -1635,6 +1638,10 @@ export default function GameBoard() {
               setSelectedBuildingId(null);
             }
           }}
+          onOpenAssetGenerator={(category) => {
+            if (category) setAssetGeneratorCategory(category);
+            setIsAssetGeneratorOpen(true);
+          }}
         />
 
         {/* Load window */}
@@ -1668,6 +1675,20 @@ export default function GameBoard() {
               promptState.onConfirm(value);
             }
             setPromptState({ ...promptState, isVisible: false });
+          }}
+        />
+
+        {/* Asset Generator Modal */}
+        <AssetGeneratorModal
+          isOpen={isAssetGeneratorOpen}
+          onClose={() => setIsAssetGeneratorOpen(false)}
+          initialCategory={assetGeneratorCategory}
+          onAssetGenerated={async (assetId, definition) => {
+            console.log('Asset generated:', assetId, definition);
+            // Load the new textures into Phaser
+            if (phaserGameRef.current) {
+              await phaserGameRef.current.loadBuildingTextures(assetId);
+            }
           }}
         />
 

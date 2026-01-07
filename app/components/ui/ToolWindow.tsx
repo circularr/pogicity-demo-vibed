@@ -9,6 +9,9 @@ import {
   getCategories,
   getBuilding,
   BuildingDefinition,
+  loadGeneratedBuildings,
+  isGeneratedBuilding,
+  deleteGeneratedBuilding,
 } from "@/app/data/buildings";
 import { playDoubleClickSound, playClickSound } from "@/app/utils/sounds";
 
@@ -22,6 +25,7 @@ interface ToolWindowProps {
   onRotate?: () => void;
   isVisible: boolean;
   onClose: () => void;
+  onOpenAssetGenerator?: (category?: BuildingCategory) => void;
 }
 
 // Get the preview sprite for a building (prefer south, fall back to first available)
@@ -63,7 +67,12 @@ export default function ToolWindow({
   onRotate,
   isVisible,
   onClose,
+  onOpenAssetGenerator,
 }: ToolWindowProps) {
+  // Load generated buildings on mount
+  useEffect(() => {
+    loadGeneratedBuildings();
+  }, []);
   // Calculate initial position (lazy to avoid SSR issues)
   const [position, setPosition] = useState(() => {
     if (typeof window === "undefined") {
@@ -310,9 +319,8 @@ export default function ToolWindow({
                   onToolSelect(ToolType.RoadNetwork);
                   playClickSound();
                 }}
-                className={`rct-button ${
-                  selectedTool === ToolType.RoadNetwork ? "active" : ""
-                }`}
+                className={`rct-button ${selectedTool === ToolType.RoadNetwork ? "active" : ""
+                  }`}
                 title="Road"
                 style={{
                   display: "flex",
@@ -340,9 +348,8 @@ export default function ToolWindow({
                   onToolSelect(ToolType.Asphalt);
                   playClickSound();
                 }}
-                className={`rct-button ${
-                  selectedTool === ToolType.Asphalt ? "active" : ""
-                }`}
+                className={`rct-button ${selectedTool === ToolType.Asphalt ? "active" : ""
+                  }`}
                 title="Asphalt"
                 style={{
                   display: "flex",
@@ -370,9 +377,8 @@ export default function ToolWindow({
                   onToolSelect(ToolType.Tile);
                   playClickSound();
                 }}
-                className={`rct-button ${
-                  selectedTool === ToolType.Tile ? "active" : ""
-                }`}
+                className={`rct-button ${selectedTool === ToolType.Tile ? "active" : ""
+                  }`}
                 title="Tile"
                 style={{
                   display: "flex",
@@ -400,9 +406,8 @@ export default function ToolWindow({
                   onToolSelect(ToolType.Snow);
                   playClickSound();
                 }}
-                className={`rct-button ${
-                  selectedTool === ToolType.Snow ? "active" : ""
-                }`}
+                className={`rct-button ${selectedTool === ToolType.Snow ? "active" : ""
+                  }`}
                 title="Snow"
                 style={{
                   display: "flex",
@@ -491,64 +496,139 @@ export default function ToolWindow({
               width: "100%",
             }}
           >
+            {/* + New AI Asset Button */}
+            {onOpenAssetGenerator && (
+              <button
+                onClick={() => {
+                  onOpenAssetGenerator(activeTab as BuildingCategory);
+                  playClickSound();
+                }}
+                onMouseEnter={() => setHoveredBuilding('Generate new with AI')}
+                onMouseLeave={() => setHoveredBuilding(null)}
+                className="rct-button"
+                style={{
+                  display: "flex",
+                  flexDirection: "column",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  padding: 4,
+                  minHeight: 60,
+                  overflow: "hidden",
+                }}
+                title="Generate new asset with AI"
+              >
+                <div
+                  style={{
+                    width: 56,
+                    height: 50,
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    fontSize: 28,
+                    opacity: 0.6,
+                  }}
+                >
+                  ✨
+                </div>
+              </button>
+            )}
             {getBuildingsByCategory(activeTab).map((building) => {
               const previewSprite = getBuildingPreviewSprite(building);
               const previewZoom = getBuildingPreviewZoom(building);
               const isSelected =
                 selectedTool === ToolType.Building &&
                 selectedBuildingId === building.id;
+              const isGenerated = isGeneratedBuilding(building.id);
 
               return (
-                <button
+                <div
                   key={building.id}
-                  onClick={() => {
-                    onToolSelect(ToolType.Building);
-                    onBuildingSelect(building.id);
-                    playClickSound();
-                  }}
+                  style={{ position: 'relative' }}
                   onMouseEnter={() => setHoveredBuilding(building.name)}
                   onMouseLeave={() => setHoveredBuilding(null)}
-                  className={`rct-button ${isSelected ? "active" : ""}`}
-                  style={{
-                    display: "flex",
-                    flexDirection: "column",
-                    alignItems: "center",
-                    justifyContent: "center",
-                    padding: 4,
-                    minHeight: 60,
-                    overflow: "hidden",
-                    background: isSelected
-                      ? "var(--rct-button-active)"
-                      : undefined,
-                  }}
                 >
-                  <div
+                  <button
+                    onClick={() => {
+                      onToolSelect(ToolType.Building);
+                      onBuildingSelect(building.id);
+                      playClickSound();
+                    }}
+                    className={`rct-button ${isSelected ? "active" : ""}`}
                     style={{
-                      width: 56,
-                      height: 50,
                       display: "flex",
-                      alignItems: "flex-end",
+                      flexDirection: "column",
+                      alignItems: "center",
                       justifyContent: "center",
+                      padding: 4,
+                      minHeight: 60,
                       overflow: "hidden",
-                      position: "relative",
+                      background: isSelected
+                        ? "var(--rct-button-active)"
+                        : undefined,
                     }}
                   >
-                    {/* Render at half size then scale up 2x for chunky pixel effect */}
-                    <img
-                      src={previewSprite}
-                      alt={building.name}
+                    <div
                       style={{
-                        width: `${previewZoom / 2}%`,
-                        height: `${previewZoom / 2}%`,
-                        objectFit: "cover",
-                        objectPosition: "center bottom",
-                        imageRendering: "pixelated",
-                        transform: "scale(2)",
-                        transformOrigin: "center bottom",
+                        width: 56,
+                        height: 50,
+                        display: "flex",
+                        alignItems: "flex-end",
+                        justifyContent: "center",
+                        overflow: "hidden",
+                        position: "relative",
                       }}
-                    />
-                  </div>
-                </button>
+                    >
+                      {/* Render at half size then scale up 2x for chunky pixel effect */}
+                      <img
+                        src={previewSprite}
+                        alt={building.name}
+                        style={{
+                          width: `${previewZoom / 2}%`,
+                          height: `${previewZoom / 2}%`,
+                          objectFit: "cover",
+                          objectPosition: "center bottom",
+                          imageRendering: "pixelated",
+                          transform: "scale(2)",
+                          transformOrigin: "center bottom",
+                        }}
+                      />
+                    </div>
+                  </button>
+                  {/* Delete button for AI-generated assets */}
+                  {isGenerated && hoveredBuilding === building.name && (
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        if (confirm(`Delete "${building.name}"? This cannot be undone.`)) {
+                          deleteGeneratedBuilding(building.id);
+                          // Force re-render by updating state
+                          setHoveredBuilding(null);
+                        }
+                      }}
+                      style={{
+                        position: 'absolute',
+                        top: 2,
+                        right: 2,
+                        width: 18,
+                        height: 18,
+                        padding: 0,
+                        background: 'rgba(180, 50, 50, 0.9)',
+                        border: '1px solid #600',
+                        borderRadius: 3,
+                        color: 'white',
+                        fontSize: 11,
+                        cursor: 'pointer',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        zIndex: 10,
+                      }}
+                      title="Delete this AI-generated asset"
+                    >
+                      🗑
+                    </button>
+                  )}
+                </div>
               );
             })}
           </div>

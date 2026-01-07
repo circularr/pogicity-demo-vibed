@@ -106,8 +106,8 @@ export class MainScene extends Phaser.Scene {
 
   // Event callbacks
   private events_: SceneEvents = {
-    onTileClick: () => {},
-    onTileHover: () => {},
+    onTileClick: () => { },
+    onTileHover: () => { },
   };
 
   // Zoom level
@@ -205,6 +205,45 @@ export class MainScene extends Phaser.Scene {
         this.load.image(`${car}_${dir}`, `/cars/${car}${dir}.png`);
       }
     }
+  }
+
+  // Dynamically load textures for a newly generated building
+  loadBuildingTextures(buildingId: string): Promise<void> {
+    const building = getBuilding(buildingId);
+    if (!building) {
+      console.warn(`Building ${buildingId} not found in registry`);
+      return Promise.resolve();
+    }
+
+    return new Promise((resolve) => {
+      const texturesToLoad: Array<{ key: string; path: string }> = [];
+
+      for (const [dir, path] of Object.entries(building.sprites)) {
+        const key = `${building.id}_${dir}`;
+        // Only load if not already loaded
+        if (!this.textures.exists(key)) {
+          texturesToLoad.push({ key, path });
+        }
+      }
+
+      if (texturesToLoad.length === 0) {
+        resolve();
+        return;
+      }
+
+      // Load the textures
+      for (const { key, path } of texturesToLoad) {
+        this.load.image(key, path);
+      }
+
+      // When loading completes, resolve
+      this.load.once('complete', () => {
+        console.log(`Loaded textures for building: ${buildingId}`);
+        resolve();
+      });
+
+      this.load.start();
+    });
   }
 
   create(): void {

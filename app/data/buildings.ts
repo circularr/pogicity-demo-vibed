@@ -1307,3 +1307,102 @@ export const CATEGORY_NAMES: Record<BuildingCategory, string> = {
   props: "Props",
   christmas: "🎄 Christmas",
 };
+
+// Register a new building at runtime (for AI-generated assets)
+export function registerBuilding(definition: BuildingDefinition): void {
+  BUILDINGS[definition.id] = definition;
+}
+
+// Get all registered building IDs
+export function getAllBuildingIds(): string[] {
+  return Object.keys(BUILDINGS);
+}
+
+// Load generated buildings from localStorage (persisted definitions)
+export function loadGeneratedBuildings(): void {
+  if (typeof window === 'undefined') return;
+
+  try {
+    const stored = localStorage.getItem('pogicity_generated_buildings');
+    if (stored) {
+      const definitions: BuildingDefinition[] = JSON.parse(stored);
+      for (const def of definitions) {
+        BUILDINGS[def.id] = def;
+      }
+      console.log(`Loaded ${definitions.length} generated buildings`);
+    }
+  } catch (error) {
+    console.error('Failed to load generated buildings:', error);
+  }
+}
+
+// Save a generated building to localStorage for persistence
+export function saveGeneratedBuilding(definition: BuildingDefinition): void {
+  if (typeof window === 'undefined') return;
+
+  try {
+    const stored = localStorage.getItem('pogicity_generated_buildings');
+    const definitions: BuildingDefinition[] = stored ? JSON.parse(stored) : [];
+
+    // Remove existing with same ID if present
+    const filtered = definitions.filter(d => d.id !== definition.id);
+    filtered.push(definition);
+
+    localStorage.setItem('pogicity_generated_buildings', JSON.stringify(filtered));
+
+    // Also register it immediately
+    BUILDINGS[definition.id] = definition;
+  } catch (error) {
+    console.error('Failed to save generated building:', error);
+  }
+}
+
+// Check if a building is AI-generated (stored in localStorage)
+export function isGeneratedBuilding(buildingId: string): boolean {
+  if (typeof window === 'undefined') return false;
+
+  try {
+    const stored = localStorage.getItem('pogicity_generated_buildings');
+    if (!stored) return false;
+    const definitions: BuildingDefinition[] = JSON.parse(stored);
+    return definitions.some(d => d.id === buildingId);
+  } catch {
+    return false;
+  }
+}
+
+// Delete a generated building from localStorage and registry
+export function deleteGeneratedBuilding(buildingId: string): void {
+  if (typeof window === 'undefined') return;
+
+  try {
+    // Remove from localStorage
+    const stored = localStorage.getItem('pogicity_generated_buildings');
+    if (stored) {
+      const definitions: BuildingDefinition[] = JSON.parse(stored);
+      const filtered = definitions.filter(d => d.id !== buildingId);
+      localStorage.setItem('pogicity_generated_buildings', JSON.stringify(filtered));
+    }
+
+    // Remove from registry
+    delete BUILDINGS[buildingId];
+
+    console.log(`Deleted generated building: ${buildingId}`);
+  } catch (error) {
+    console.error('Failed to delete generated building:', error);
+  }
+}
+
+// Get list of all generated building IDs
+export function getGeneratedBuildingIds(): string[] {
+  if (typeof window === 'undefined') return [];
+
+  try {
+    const stored = localStorage.getItem('pogicity_generated_buildings');
+    if (!stored) return [];
+    const definitions: BuildingDefinition[] = JSON.parse(stored);
+    return definitions.map(d => d.id);
+  } catch {
+    return [];
+  }
+}

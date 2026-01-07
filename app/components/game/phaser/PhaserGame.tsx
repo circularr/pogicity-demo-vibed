@@ -25,6 +25,7 @@ export interface PhaserGameHandle {
   clearCars: () => void;
   shakeScreen: (axis?: "x" | "y", intensity?: number, duration?: number) => void;
   zoomAtPoint: (zoom: number, screenX: number, screenY: number) => void;
+  loadBuildingTextures: (buildingId: string) => Promise<void>;
 }
 
 interface PhaserGameProps {
@@ -132,6 +133,11 @@ const PhaserGame = forwardRef<PhaserGameHandle, PhaserGameProps>(
           if (sceneRef.current) {
             zoomFromAtPoint.current = zoom; // Track this zoom value to skip re-centering
             sceneRef.current.zoomAtPoint(zoom, screenX, screenY);
+          }
+        },
+        loadBuildingTextures: async (buildingId: string) => {
+          if (sceneRef.current) {
+            await sceneRef.current.loadBuildingTextures(buildingId);
           }
         },
       }),
