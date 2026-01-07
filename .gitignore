@@ -39,3 +39,12 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# Asset generation
+helper for ai
+ADDING_ASSETS.md
+
+# Large source files
+*.psd
+*.ai
+*.tiff
