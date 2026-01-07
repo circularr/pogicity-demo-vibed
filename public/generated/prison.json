@@ -1,0 +1,1 @@
+{"id":"prison","name":"prison","category":"commercial","footprint":{"width":4,"height":4},"sprites":{"south":"/Building/commercial/4x4prison_south.png","north":"/Building/commercial/4x4prison_north.png","east":"/Building/commercial/4x4prison_east.png","west":"/Building/commercial/4x4prison_west.png"},"icon":"🏢","supportsRotation":true}

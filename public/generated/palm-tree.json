@@ -1,0 +1,1 @@
+{"id":"palm-tree","name":"palm tree","category":"props","footprint":{"width":6,"height":6},"sprites":{"south":"/Props/6x6palm-tree_south.png","north":"/Props/6x6palm-tree_north.png","east":"/Props/6x6palm-tree_east.png","west":"/Props/6x6palm-tree_west.png"},"icon":"🏢","supportsRotation":true,"isDecoration":true}

@@ -12,6 +12,7 @@ import {
   loadGeneratedBuildings,
   isGeneratedBuilding,
   deleteGeneratedBuilding,
+  fetchGeneratedAssetsFromServer,
 } from "@/app/data/buildings";
 import { playDoubleClickSound, playClickSound } from "@/app/utils/sounds";
 
@@ -71,7 +72,12 @@ export default function ToolWindow({
 }: ToolWindowProps) {
   // Load generated buildings on mount
   useEffect(() => {
+    // 1. Load from local storage
     loadGeneratedBuildings();
+    // 2. Sync from server files (for cloned repos)
+    fetchGeneratedAssetsFromServer().then(() => {
+      // Force re-render if needed (state update would be better but this works for now)
+    });
   }, []);
   // Calculate initial position (lazy to avoid SSR issues)
   const [position, setPosition] = useState(() => {

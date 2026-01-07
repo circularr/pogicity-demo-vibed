@@ -1406,3 +1406,44 @@ export function getGeneratedBuildingIds(): string[] {
     return [];
   }
 }
+
+// Fetch generated assets from server API (e.g., from git clone) and sync with localStorage
+export async function fetchGeneratedAssetsFromServer(): Promise<void> {
+  if (typeof window === 'undefined') return;
+
+  try {
+    const response = await fetch('/api/assets/list');
+    if (!response.ok) return;
+
+    const data = await response.json();
+    const serverBuildings: BuildingDefinition[] = data.buildings || [];
+
+    if (serverBuildings.length === 0) return;
+
+    // Merge with localStorage
+    const stored = localStorage.getItem('pogicity_generated_buildings');
+    const localBuildings: BuildingDefinition[] = stored ? JSON.parse(stored) : [];
+
+    // Create a map of existing IDs for faster lookup
+    const existingIds = new Set(localBuildings.map(b => b.id));
+    let hasNew = false;
+
+    for (const building of serverBuildings) {
+      // Register in runtime memory
+      BUILDINGS[building.id] = building;
+
+      // Add to localStorage if missing
+      if (!existingIds.has(building.id)) {
+        localBuildings.push(building);
+        hasNew = true;
+      }
+    }
+
+    if (hasNew) {
+      localStorage.setItem('pogicity_generated_buildings', JSON.stringify(localBuildings));
+      console.log('Synced generated assets from server');
+    }
+  } catch (error) {
+    console.warn('Failed to fetch generated assets from server:', error);
+  }
+}

@@ -1,0 +1,1 @@
+{"id":"cat-cafe","name":"cat cafe","category":"commercial","footprint":{"width":2,"height":2},"sprites":{"south":"/Building/commercial/2x2cat-cafe_south.png","north":"/Building/commercial/2x2cat-cafe_north.png","east":"/Building/commercial/2x2cat-cafe_east.png","west":"/Building/commercial/2x2cat-cafe_west.png"},"icon":"🏢","supportsRotation":true}
