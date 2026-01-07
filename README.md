@@ -14,6 +14,35 @@ This is a foundation for building isometric strategy games—city builders, tyco
 - **Save/Load** - Persist your city to localStorage
 - **Multiple Tile Types** - Grass, asphalt, snow, and more
 - **Building Categories** - Residential, commercial, civic, landmarks, props, and seasonal (Christmas!)
+- **AI Asset Generator** - Create custom buildings and props directly in-game using Generative AI (Gemini/OpenRouter).
+
+## ✨ AI Asset Generation Setup
+
+This project features a powerful **AI Asset Pipeline** that allows you to generate new isometric buildings and props on the fly.
+
+### How It Works
+1. **Prompting**: You describe what you want (e.g., "A cyberpunk noodle shop").
+2. **Initial Generation**: The AI generates the front (South) view first.
+3. **Consistency Loop**: Once you approve the preview, the system uses that image as a **reference** (Image-to-Image) to generate the other 3 angles (North, East, West), ensuring the architectural style and colors remain consistent.
+4. **Auto-Processing**: The system automatically removes the background, resizes the sprite to the correct scale, and registers it in the game.
+
+### Setting Up OpenRouter
+To use the generator, you need an API key from OpenRouter (which gives access to models like Google Gemini Pro and Flash).
+
+1. Go to [OpenRouter.ai](https://openrouter.ai/) and create an account.
+2. **Add Credits**: We recommend loading just **$5.00** to start. This will generate hundreds of assets (Gemini Flash costs ~$0.03 per image).
+3. **Set Limits**: In your OpenRouter settings, you can set a monthly usage limit to ensure you never overspend.
+4. **Get Key**: Create a new API key.
+5. Create a `.env.local` file in the root directory and add:
+   ```bash
+   OPENROUTER_API_KEY=sk-or-your-key-here
+   ```
+   *(Note: Never commit this file to git!)*
+
+### Managing Assets
+- Generated assets are saved to `public/generated/` and `public/Building/`.
+- Hover over any AI-generated asset in the picker to see a **Delete (🗑️)** button.
+- Assets are automatically synced from the server, so if you push your changes to git, other players who clone your repo will get your custom buildings!
 
 ## Getting Started
 
